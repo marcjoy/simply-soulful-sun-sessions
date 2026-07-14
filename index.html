@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sun Sessions — Track Selector</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --midnight: #0a0d1a;
+    --midnight-lift: #111530;
+    --deep-blue: #1a1f3a;
+    --amber: #e8a84c;
+    --amber-glow: #f4c26b;
+    --brick: #8b4a3a;
+    --brick-warm: #a05a48;
+    --cream: #f5efe0;
+    --cream-dim: #d9d0bd;
+    --muted-gold: #b8945a;
+    --vinyl-black: #1c1c1c;
+    --text-muted: #8b8a ninety;
+    --radius: 6px;
+    --radius-lg: 10px;
+    --font-display: 'Georgia', 'Times New Roman', serif;
+    --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.5);
+    --shadow-glow: 0 0 20px rgba(232,168,76,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    background: var(--midnight);
+    color: var(--cream);
+    min-height: 100vh;
+    line-height: 1.6;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(232,168,76,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 60%, rgba(139,74,58,0.06) 0%, transparent 60%);
+  }
+
+  /* ===== BRICK TEXTURE OVERLAY ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 58px, rgba(139,74,58,0.03) 58px, rgba(139,74,58,0.03) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 110px, rgba(255,255,255,0.008) 110px, rgba(255,255,255,0.008) 112px),
+      repeating-linear-gradient(90deg, transparent, transparent 220px, rgba(255,255,255,0.012) 220px, rgba(255,255,255,0.012) 222px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 3rem 1.5rem 2rem;
+    border-bottom: 1px solid rgba(232,168,76,0.2);
+    background: linear-gradient(180deg, rgba(10,13,26,0.95) 0%, rgba(10,13,26,0.7) 100%);
+  }
+
+  .header-jazzmark {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--amber);
+    background: rgba(232,168,76,0.08);
+    border: 1px solid rgba(232,168,76,0.25);
+    padding: 0.4em 1.2em;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+  }
+
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--cream);
+    margin-bottom: 0.35rem;
+  }
+
+  .header .subtitle {
+    font-size: 1rem;
+    color: var(--amber);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .header .details {
+    font-size: 0.85rem;
+    color: var(--cream-dim);
+    line-height: 1.7;
+  }
+
+  .header .details span { color: var(--amber); }
+
+  /* ===== INSTRUCTIONS ===== */
+  .instructions {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1.25rem 1.5rem;
+    background: rgba(17,21,48,0.6);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.9rem;
+    color: var(--cream-dim);
+  }
+  .instructions strong { color: var(--amber-glow); }
+
+  /* ===== ADMIN BAR ===== */
+  .admin-bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0 1rem 1.5rem;
+  }
+  .btn {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.55em 1.4em;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(232,168,76,0.3);
+    background: transparent;
+    color: var(--amber);
+  }
+  .btn:hover {
+    background: rgba(232,168,76,0.1);
+    border-color: var(--amber);
+    box-shadow: var(--shadow-glow);
+  }
+  .btn.reset { border-color: rgba(139,74,58,0.5); color: var(--brick-warm); }
+  .btn.reset:hover { background: rgba(139,74,58,0.12); border-color: var(--brick-warm); }
+
+  /* ===== TRACK GRID ===== */
+  .track-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1.25rem;
+    padding: 0 1.5rem 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ===== TRACK CARD ===== */
+  .track-card {
+    background: var(--vinyl-black);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  .track-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(232,168,76,0.4), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .track-card:hover::after { opacity: 1; }
+
+  .track-card.claimed {
+    border-color: rgba(232,168,76,0.35);
+    background: linear-gradient(160deg, var(--vinyl-black) 0%, rgba(26,31,58,0.6) 100%);
+  }
+  .track-card.claimed::before {
+    content: 'CLAIMED';
+    position: absolute;
+    top: 12px; right: 14px;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: var(--amber);
+    background: rgba(232,168,76,0.1);
+    padding: 0.2em 0.7em;
+    border-radius: 2px;
+    border: 1px solid rgba(232,168,76,0.2);
+  }
+
+  /* Card header */
+  .track-card .track-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--cream);
+    line-height: 1.3;
+    padding-right: 60px; /* room for CLAIMED badge */
+  }
+
+  .track-card .track-meta {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .track-card .track-meta span {
+    padding: 0.15em 0.6em;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+  }
+
+  /* Audio player */
+  .audio-player {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .play-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 2px solid var(--amber);
+    background: transparent;
+    color: var(--amber);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+  }
+  .play-btn:hover { background: rgba(232,168,76,0.15); box-shadow: var(--shadow-glow); }
+  .play-btn.playing { background: var(--amber); color: var(--midnight); }
+
+  .progress-bar {
+    flex: 1; height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: var(--amber);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+    pointer-events: none;
+  }
+  .time-display {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    min-width: 36px;
+    text-align: right;
+    letter-spacing: 0.05em;
+  }
+
+  /* Claim section */
+  .claim-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .claim-area .artist-name-display {
+    font-size: 0.85rem;
+    color: var(--amber-glow);
+    font-style: italic;
+    padding: 0.4em 0;
+    border-bottom: 1px dashed rgba(232,168,76,0.2);
+    min-height: 1.6em;
+  }
+  .claim-area .artist-name-display:empty::before {
+    content: 'Available';
+    color: var(--text-muted);
+    font-style: normal;
+  }
+
+  .claim-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .claim-form input {
+    flex: 1;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    padding: 0.5em 0.75em;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius);
+    color: var(--cream);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .claim-form input:focus { border-color: var(--amber); }
+  .claim-form input::placeholder { color: rgba(255,255,255,0.2); }
+
+  .claim-form .claim-btn {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.55em 1.2em;
+    border-radius: var(--radius);
+    cursor: pointer;
+    background: transparent;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .claim-form .claim-btn:hover { background: rgba(232,168,76,0.15); box-shadow: var(--shadow-glow); }
+
+  .release-btn {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid rgba(139,74,58,0.4);
+    color: var(--brick-warm);
+    padding: 0.35em 0.9em;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-self: flex-start;
+  }
+  .release-btn:hover { background: rgba(139,74,58,0.12); border-color: var(--brick-warm); }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem 1.5rem 3rem;
+    border-top: 1px solid rgba(232,168,76,0.12);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+  .footer .jackson-st {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--amber);
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .track-grid { grid-template-columns: 1fr; padding: 0 1rem 2rem; }
+    .header { padding: 2rem 1rem 1.5rem; }
+    .header h1 { font-size: 1.5rem; }
+    .track-card { padding: 1.15rem; }
+    .claim-form { flex-direction: column; }
+    .claim-form .claim-btn { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-jazzmark">Jackson Street &bull; After Hours</div>
+  <h1>Sun Sessions</h1>
+  <div class="subtitle">Spoken Word Track Selector</div>
+  <p class="details">
+    <span>Simply Soulful</span> &bull; 2321 S Jackson St, Seattle<br>
+    Sunday, July 26 &bull; 3:00 PM<br>
+    Curated by Logic Amen &amp; Phil
+  </p>
+</header>
+
+<!-- INSTRUCTIONS -->
+<div class="instructions">
+  <strong>How this works:</strong> Browse the tracks below. Click play to preview.
+  When you find the one that speaks to you, enter your name and claim it.
+  First come, first served. One artist per track.<br>
+  <em style="font-size:0.85em;">All selections save automatically in your browser.</em>
+</div>
+
+<!-- ADMIN -->
+<div class="admin-bar">
+  <button class="btn" onclick="exportClaims()">Export Claim List</button>
+  <button class="btn reset" onclick="resetAll()">Reset All Claims</button>
+</div>
+
+<!-- TRACK GRID -->
+<div class="track-grid" id="trackGrid"></div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p class="jackson-st">"All races meet on common ground and rub shoulders as equals."</p>
+  <p>The Northwest Enterprise, 1933 &bull; Jackson Street Jazz District</p>
+  <p style="margin-top:0.5rem;">Music by Marc Joy Media &bull; Produced with Phil</p>
+</footer>
+
+<script>
+// ===== TRACK DATA =====
+const TRACKS = [
+  { id: 'midnight-ether',       title: 'Midnight in the Ether',      file: 'music/mp3/Midnight in the Ether.mp3' },
+  { id: 'midnight-overture-1',  title: 'Midnight Overture (1)',      file: 'music/mp3/Midnight Overture (1).mp3' },
+  { id: 'midnight-overture-2',  title: 'Midnight Overture (2)',      file: 'music/mp3/Midnight Overture (2).mp3' },
+  { id: 'midnight-overture-3',  title: 'Midnight Overture (3)',      file: 'music/mp3/Midnight Overture (3).mp3' },
+  { id: 'midnight-overture',    title: 'Midnight Overture',          file: 'music/mp3/Midnight Overture.mp3' },
+  { id: 'midnight-static-1',    title: 'Midnight Static (1)',        file: 'music/mp3/Midnight Static (1).mp3' },
+  { id: 'midnight-static',      title: 'Midnight Static',            file: 'music/mp3/Midnight Static.mp3' },
+  { id: 'midnight-velvet',      title: 'Midnight Velvet',            file: 'music/mp3/Midnight Velvet.mp3' },
+  { id: 'midnight-walk',        title: 'Midnight Walk',              file: 'music/mp3/Midnight Walk.mp3' },
+  { id: 'six-note-1',           title: 'The Six Note Figure (1)',    file: 'music/mp3/The Six Note Figure (1).mp3' },
+  { id: 'six-note-2',           title: 'The Six Note Figure (2)',    file: 'music/mp3/The Six Note Figure (2).mp3' },
+  { id: 'six-note',             title: 'The Six Note Figure',        file: 'music/mp3/The Six Note Figure.mp3' },
+  { id: 'three-beat',           title: 'Three Beat Call',            file: 'music/mp3/Three Beat Call.mp3' },
+  { id: 'unresolved-chord-1',   title: 'Unresolved Chord (1)',       file: 'music/mp3/Unresolved Chord (1).mp3' },
+  { id: 'unresolved-chord',     title: 'Unresolved Chord',           file: 'music/mp3/Unresolved Chord.mp3' },
+  { id: 'unresolved-minor',     title: 'Unresolved Minor',           file: 'music/mp3/Unresolved Minor.mp3' },
+];
+
+// ===== STATE =====
+let claims = {};
+let currentAudio = null;
+let currentPlayBtn = null;
+
+function loadClaims() {
+  try {
+    const stored = localStorage.getItem('sun-sessions-claims');
+    if (stored) claims = JSON.parse(stored);
+  } catch(e) { claims = {}; }
+}
+function saveClaims() {
+  localStorage.setItem('sun-sessions-claims', JSON.stringify(claims));
+}
+
+// ===== BUILD UI =====
+function formatDuration(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+function buildTrackCard(track) {
+  const claimed = claims[track.id] || null;
+  const card = document.createElement('div');
+  card.className = 'track-card' + (claimed ? ' claimed' : '');
+  card.id = 'card-' + track.id;
+
+  // We'll load the audio to get duration
+  const audio = new Audio();
+  audio.preload = 'metadata';
+  audio.src = track.file;
+
+  // Group name parts for display
+  const nameParts = track.title.match(/^(.*?)(\s*\(\d+\))?$/);
+  const baseName = nameParts ? nameParts[1] : track.title;
+  const variant = nameParts && nameParts[2] ? nameParts[2].trim() : '';
+
+  // Determine category tag
+  let category = 'Spoken Word';
+  if (track.title.includes('Overture')) category = 'Overture';
+  else if (track.title.includes('Static')) category = 'Ambient';
+  else if (track.title.includes('Velvet') || track.title.includes('Walk')) category = 'Mood';
+  else if (track.title.includes('Six Note')) category = 'Figure Study';
+  else if (track.title.includes('Beat')) category = 'Call';
+  else if (track.title.includes('Chord') || track.title.includes('Minor')) category = 'Tension';
+
+  // Build track card HTML — safe: all content from hardcoded TRACKS array and localStorage (same-origin user data)
+  card.innerHTML = `
+    <div class="track-name">${track.title}</div>
+    <div class="track-meta">
+      <span>${category}</span>
+      <span class="dur-${track.id}">--:--</span>
+    </div>
+    <div class="audio-player">
+      <button class="play-btn" data-track="${track.id}" title="Play / Pause">▶</button>
+      <div class="progress-bar" data-track="${track.id}">
+        <div class="fill" id="fill-${track.id}"></div>
+      </div>
+      <div class="time-display" id="time-${track.id}">0:00</div>
+    </div>
+    <div class="claim-area">
+      <div class="artist-name-display" id="artist-${track.id}">${claimed || ''}</div>
+      <div class="claim-form">
+        <input type="text" id="input-${track.id}" placeholder="Your name..." maxlength="60">
+        <button class="claim-btn" data-track="${track.id}">Claim</button>
+      </div>
+      ${claimed ? '<button class="release-btn" data-track="' + track.id + '">Release</button>' : ''}
+    </div>
+  `;
+
+  // Load duration
+  audio.addEventListener('loadedmetadata', () => {
+    const durEl = card.querySelector('.dur-' + track.id);
+    if (durEl) durEl.textContent = formatDuration(audio.duration);
+  });
+
+  return card;
+}
+
+function renderAll() {
+  const grid = document.getElementById('trackGrid');
+  grid.innerHTML = '';
+  TRACKS.forEach(track => {
+    grid.appendChild(buildTrackCard(track));
+  });
+  attachEvents();
+}
+
+// ===== AUDIO PLAYBACK =====
+function attachEvents() {
+  // Play buttons
+  document.querySelectorAll('.play-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const trackId = btn.dataset.track;
+      togglePlay(trackId, btn);
+    });
+  });
+
+  // Claim buttons
+  document.querySelectorAll('.claim-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const trackId = btn.dataset.track;
+      claimTrack(trackId);
+    });
+  });
+
+  // Release buttons
+  document.querySelectorAll('.release-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const trackId = btn.dataset.track;
+      releaseTrack(trackId);
+    });
+  });
+
+  // Enter key on inputs
+  document.querySelectorAll('.claim-form input').forEach(input => {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const trackId = input.id.replace('input-', '');
+        claimTrack(trackId);
+      }
+    });
+  });
+
+  // Progress bar clicks
+  document.querySelectorAll('.progress-bar').forEach(bar => {
+    bar.addEventListener('click', e => {
+      if (!currentAudio) return;
+      const trackId = bar.dataset.track;
+      const audio = currentAudio;
+      if (!audio || !audio.src.includes(encodeURI(trackId))) return;
+      const rect = bar.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pct * audio.duration;
+    });
+  });
+}
+
+function togglePlay(trackId, btn) {
+  const track = TRACKS.find(t => t.id === trackId);
+  if (!track) return;
+
+  // If same track is playing, pause it
+  if (currentAudio && currentAudio.dataset.trackId === trackId && !currentAudio.paused) {
+    currentAudio.pause();
+    btn.textContent = '▶';
+    btn.classList.remove('playing');
+    return;
+  }
+
+  // Stop any currently playing
+  if (currentAudio) {
+    currentAudio.pause();
+    if (currentPlayBtn) {
+      currentPlayBtn.textContent = '▶';
+      currentPlayBtn.classList.remove('playing');
+    }
+  }
+
+  // Create new audio
+  const audio = new Audio(track.file);
+  audio.dataset.trackId = trackId;
+  currentAudio = audio;
+  currentPlayBtn = btn;
+
+  btn.textContent = '⏸';
+  btn.classList.add('playing');
+
+  // Update progress
+  const fillEl = document.getElementById('fill-' + trackId);
+  const timeEl = document.getElementById('time-' + trackId);
+
+  audio.addEventListener('timeupdate', () => {
+    if (audio.duration) {
+      const pct = (audio.currentTime / audio.duration) * 100;
+      if (fillEl) fillEl.style.width = pct + '%';
+    }
+    if (timeEl) timeEl.textContent = formatDuration(audio.currentTime);
+  });
+
+  audio.addEventListener('ended', () => {
+    btn.textContent = '▶';
+    btn.classList.remove('playing');
+    if (fillEl) fillEl.style.width = '0%';
+    if (timeEl) timeEl.textContent = '0:00';
+    currentAudio = null;
+    currentPlayBtn = null;
+  });
+
+  audio.addEventListener('error', () => {
+    btn.textContent = '▶';
+    btn.classList.remove('playing');
+    console.error('Failed to load:', track.file);
+    currentAudio = null;
+    currentPlayBtn = null;
+  });
+
+  audio.play().catch(err => {
+    console.error('Playback failed:', err);
+    btn.textContent = '▶';
+    btn.classList.remove('playing');
+    currentAudio = null;
+    currentPlayBtn = null;
+  });
+}
+
+// ===== CLAIM / RELEASE =====
+function claimTrack(trackId) {
+  const input = document.getElementById('input-' + trackId);
+  const name = input.value.trim();
+  if (!name) {
+    input.focus();
+    input.style.borderColor = 'var(--brick-warm)';
+    setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    return;
+  }
+  claims[trackId] = name;
+  saveClaims();
+  input.value = '';
+  refreshCard(trackId);
+}
+
+function releaseTrack(trackId) {
+  delete claims[trackId];
+  saveClaims();
+  refreshCard(trackId);
+}
+
+function refreshCard(trackId) {
+  const track = TRACKS.find(t => t.id === trackId);
+  if (!track) return;
+  const card = document.getElementById('card-' + trackId);
+  if (!card) return;
+  const claimed = claims[trackId] || null;
+
+  // Update claimed class
+  card.classList.toggle('claimed', !!claimed);
+
+  // Update artist display
+  const artistEl = document.getElementById('artist-' + trackId);
+  if (artistEl) artistEl.textContent = claimed || '';
+
+  // Update release button
+  const existingRelease = card.querySelector('.release-btn');
+  if (existingRelease) existingRelease.remove();
+  if (claimed) {
+    const releaseBtn = document.createElement('button');
+    releaseBtn.className = 'release-btn';
+    releaseBtn.dataset.track = trackId;
+    releaseBtn.textContent = 'Release';
+    releaseBtn.addEventListener('click', () => releaseTrack(trackId));
+    card.querySelector('.claim-area').appendChild(releaseBtn);
+  }
+}
+
+// ===== ADMIN =====
+function exportClaims() {
+  const lines = [];
+  TRACKS.forEach(t => {
+    const artist = claims[t.id] || '(Available)';
+    lines.push(`${t.title} — ${artist}`);
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'sun-sessions-claims.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetAll() {
+  if (confirm('Reset ALL claims? This cannot be undone. All artist selections will be cleared.')) {
+    claims = {};
+    saveClaims();
+    TRACKS.forEach(t => refreshCard(t.id));
+  }
+}
+
+// ===== INIT =====
+loadClaims();
+renderAll();
+</script>
+
+</body>
+</html>

@@ -349,6 +349,36 @@
   }
   .release-btn:hover { background: rgba(139,74,58,0.12); border-color: var(--brick-warm); }
 
+  /* Notes area — appears after claiming */
+  .notes-area {
+    margin-top: 0.25rem;
+  }
+  .notes-area label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+  }
+  .notes-area textarea {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    padding: 0.5em 0.75em;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    color: var(--cream-dim);
+    resize: vertical;
+    min-height: 52px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    line-height: 1.5;
+  }
+  .notes-area textarea:focus { border-color: rgba(232,168,76,0.4); }
+  .notes-area textarea::placeholder { color: rgba(255,255,255,0.15); }
+
   /* ===== FOOTER ===== */
   .footer {
     position: relative;
@@ -420,26 +450,29 @@
 
 <script>
 // ===== TRACK DATA =====
+// Names rooted in Seattle's Central District / Jackson Street Jazz District history
 const TRACKS = [
-  { id: 'midnight-ether',       title: 'Midnight in the Ether',      file: 'music/mp3/Midnight in the Ether.mp3' },
-  { id: 'midnight-overture-1',  title: 'Midnight Overture (1)',      file: 'music/mp3/Midnight Overture (1).mp3' },
-  { id: 'midnight-overture-2',  title: 'Midnight Overture (2)',      file: 'music/mp3/Midnight Overture (2).mp3' },
-  { id: 'midnight-overture-3',  title: 'Midnight Overture (3)',      file: 'music/mp3/Midnight Overture (3).mp3' },
-  { id: 'midnight-overture',    title: 'Midnight Overture',          file: 'music/mp3/Midnight Overture.mp3' },
-  { id: 'midnight-static-1',    title: 'Midnight Static (1)',        file: 'music/mp3/Midnight Static (1).mp3' },
-  { id: 'midnight-static',      title: 'Midnight Static',            file: 'music/mp3/Midnight Static.mp3' },
-  { id: 'midnight-velvet',      title: 'Midnight Velvet',            file: 'music/mp3/Midnight Velvet.mp3' },
-  { id: 'midnight-walk',        title: 'Midnight Walk',              file: 'music/mp3/Midnight Walk.mp3' },
-  { id: 'six-note-1',           title: 'The Six Note Figure (1)',    file: 'music/mp3/The Six Note Figure (1).mp3' },
-  { id: 'six-note-2',           title: 'The Six Note Figure (2)',    file: 'music/mp3/The Six Note Figure (2).mp3' },
-  { id: 'six-note',             title: 'The Six Note Figure',        file: 'music/mp3/The Six Note Figure.mp3' },
-  { id: 'three-beat',           title: 'Three Beat Call',            file: 'music/mp3/Three Beat Call.mp3' },
-  { id: 'unresolved-chord-1',   title: 'Unresolved Chord (1)',       file: 'music/mp3/Unresolved Chord (1).mp3' },
-  { id: 'unresolved-chord',     title: 'Unresolved Chord',           file: 'music/mp3/Unresolved Chord.mp3' },
-  { id: 'unresolved-minor',     title: 'Unresolved Minor',           file: 'music/mp3/Unresolved Minor.mp3' },
+  { id: 'midnight-ether',       title: 'After Hours on Jackson',    file: 'music/mp3/Midnight in the Ether.mp3',       category: 'Jackson Street' },
+  { id: 'midnight-overture-1',  title: 'Black & Tan',               file: 'music/mp3/Midnight Overture (1).mp3',       category: 'Club Era' },
+  { id: 'midnight-overture-2',  title: 'Ebony on Sixth',            file: 'music/mp3/Midnight Overture (2).mp3',       category: 'Club Era' },
+  { id: 'midnight-overture-3',  title: 'Rizal Hall, 1938',          file: 'music/mp3/Midnight Overture (3).mp3',       category: 'Club Era' },
+  { id: 'midnight-overture',    title: 'The Green Dot',             file: 'music/mp3/Midnight Overture.mp3',            category: 'Club Era' },
+  { id: 'midnight-static-1',    title: 'Governor\'s Corner',        file: 'music/mp3/Midnight Static (1).mp3',         category: 'Landmark' },
+  { id: 'midnight-static',      title: 'Yesler\'s Edge',            file: 'music/mp3/Midnight Static.mp3',              category: 'Redline' },
+  { id: 'midnight-velvet',      title: 'Madison After Dark',        file: 'music/mp3/Midnight Velvet.mp3',              category: 'Transformation' },
+  { id: 'midnight-walk',        title: 'Cherry Street Vespers',     file: 'music/mp3/Midnight Walk.mp3',                category: 'Street Hymn' },
+  { id: 'six-note-1',           title: 'Union Street Rising',       file: 'music/mp3/The Six Note Figure (1).mp3',     category: 'Ascension' },
+  { id: 'six-note-2',           title: 'The Redline',               file: 'music/mp3/The Six Note Figure (2).mp3',     category: 'Redline' },
+  { id: 'six-note',             title: 'Green Book Seattle',        file: 'music/mp3/The Six Note Figure.mp3',          category: 'Traveler' },
+  { id: 'three-beat',           title: 'Quincy\'s Promise',         file: 'music/mp3/Three Beat Call.mp3',              category: 'Legend' },
+  { id: 'unresolved-chord-1',   title: 'Ray\'s Benediction',        file: 'music/mp3/Unresolved Chord (1).mp3',        category: 'Legend' },
+  { id: 'unresolved-chord',     title: 'Ernestine\'s Reprise',      file: 'music/mp3/Unresolved Chord.mp3',             category: 'Legend' },
+  { id: 'unresolved-minor',     title: 'Central District Elegy',    file: 'music/mp3/Unresolved Minor.mp3',             category: 'Neighborhood' },
 ];
 
 // ===== STATE =====
+// claims: { trackId: { artist: string, notes: string } }
+// Legacy support: old format was { trackId: "ArtistName" } — normalized on load
 let claims = {};
 let currentAudio = null;
 let currentPlayBtn = null;
@@ -447,7 +480,16 @@ let currentPlayBtn = null;
 function loadClaims() {
   try {
     const stored = localStorage.getItem('sun-sessions-claims');
-    if (stored) claims = JSON.parse(stored);
+    if (stored) {
+      const raw = JSON.parse(stored);
+      // Normalize legacy string format to object format
+      for (const [id, val] of Object.entries(raw)) {
+        if (typeof val === 'string') {
+          raw[id] = { artist: val, notes: '' };
+        }
+      }
+      claims = raw;
+    }
   } catch(e) { claims = {}; }
 }
 function saveClaims() {
@@ -472,19 +514,13 @@ function buildTrackCard(track) {
   audio.preload = 'metadata';
   audio.src = track.file;
 
-  // Group name parts for display
-  const nameParts = track.title.match(/^(.*?)(\s*\(\d+\))?$/);
-  const baseName = nameParts ? nameParts[1] : track.title;
-  const variant = nameParts && nameParts[2] ? nameParts[2].trim() : '';
+  // Category comes from track data
+  const category = track.category;
 
-  // Determine category tag
-  let category = 'Spoken Word';
-  if (track.title.includes('Overture')) category = 'Overture';
-  else if (track.title.includes('Static')) category = 'Ambient';
-  else if (track.title.includes('Velvet') || track.title.includes('Walk')) category = 'Mood';
-  else if (track.title.includes('Six Note')) category = 'Figure Study';
-  else if (track.title.includes('Beat')) category = 'Call';
-  else if (track.title.includes('Chord') || track.title.includes('Minor')) category = 'Tension';
+  // Get claim data — supports legacy string format and new {artist, notes} format
+  const claimData = claims[track.id] || null;
+  const claimedName = typeof claimData === 'string' ? claimData : (claimData ? claimData.artist : null);
+  const claimedNotes = (claimData && typeof claimData !== 'string') ? (claimData.notes || '') : '';
 
   // Build track card HTML — safe: all content from hardcoded TRACKS array and localStorage (same-origin user data)
   card.innerHTML = `
@@ -501,12 +537,18 @@ function buildTrackCard(track) {
       <div class="time-display" id="time-${track.id}">0:00</div>
     </div>
     <div class="claim-area">
-      <div class="artist-name-display" id="artist-${track.id}">${claimed || ''}</div>
+      <div class="artist-name-display" id="artist-${track.id}">${claimedName || ''}</div>
       <div class="claim-form">
         <input type="text" id="input-${track.id}" placeholder="Your name..." maxlength="60">
         <button class="claim-btn" data-track="${track.id}">Claim</button>
       </div>
-      ${claimed ? '<button class="release-btn" data-track="' + track.id + '">Release</button>' : ''}
+      ${claimedName ? `
+        <div class="notes-area">
+          <label for="notes-${track.id}">Production notes / adjustments</label>
+          <textarea id="notes-${track.id}" placeholder="Pacing, key, instrumentation ideas...">${claimedNotes}</textarea>
+        </div>
+        <button class="release-btn" data-track="${track.id}">Release</button>
+      ` : ''}
     </div>
   `;
 
@@ -574,6 +616,14 @@ function attachEvents() {
       const rect = bar.getBoundingClientRect();
       const pct = (e.clientX - rect.left) / rect.width;
       audio.currentTime = pct * audio.duration;
+    });
+  });
+
+  // Notes textareas — auto-save on input
+  document.querySelectorAll('.notes-area textarea').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const trackId = ta.id.replace('notes-', '');
+      saveNotes(trackId);
     });
   });
 }
@@ -656,10 +706,15 @@ function claimTrack(trackId) {
     setTimeout(() => { input.style.borderColor = ''; }, 1500);
     return;
   }
-  claims[trackId] = name;
+  claims[trackId] = { artist: name, notes: '' };
   saveClaims();
   input.value = '';
   refreshCard(trackId);
+  // Focus the notes textarea after render
+  setTimeout(() => {
+    const notesEl = document.getElementById('notes-' + trackId);
+    if (notesEl) notesEl.focus();
+  }, 100);
 }
 
 function releaseTrack(trackId) {
@@ -668,39 +723,69 @@ function releaseTrack(trackId) {
   refreshCard(trackId);
 }
 
+function saveNotes(trackId) {
+  const notesEl = document.getElementById('notes-' + trackId);
+  if (!notesEl || !claims[trackId]) return;
+  claims[trackId].notes = notesEl.value;
+  saveClaims();
+}
+
 function refreshCard(trackId) {
   const track = TRACKS.find(t => t.id === trackId);
   if (!track) return;
   const card = document.getElementById('card-' + trackId);
   if (!card) return;
-  const claimed = claims[trackId] || null;
+  const claimData = claims[trackId] || null;
+  const claimedName = (claimData && typeof claimData !== 'string') ? claimData.artist : null;
+  const claimedNotes = (claimData && typeof claimData !== 'string') ? (claimData.notes || '') : '';
 
   // Update claimed class
-  card.classList.toggle('claimed', !!claimed);
+  card.classList.toggle('claimed', !!claimedName);
 
   // Update artist display
   const artistEl = document.getElementById('artist-' + trackId);
-  if (artistEl) artistEl.textContent = claimed || '';
+  if (artistEl) artistEl.textContent = claimedName || '';
 
-  // Update release button
-  const existingRelease = card.querySelector('.release-btn');
+  // Update notes area and release button
+  const claimArea = card.querySelector('.claim-area');
+  const existingNotes = claimArea.querySelector('.notes-area');
+  const existingRelease = claimArea.querySelector('.release-btn');
+  if (existingNotes) existingNotes.remove();
   if (existingRelease) existingRelease.remove();
-  if (claimed) {
+
+  if (claimedName) {
+    const notesDiv = document.createElement('div');
+    notesDiv.className = 'notes-area';
+    notesDiv.innerHTML = `
+      <label for="notes-${trackId}">Production notes / adjustments</label>
+      <textarea id="notes-${trackId}" placeholder="Pacing, key, instrumentation ideas...">${claimedNotes}</textarea>
+    `;
+    claimArea.appendChild(notesDiv);
+
+    // Attach notes save listener
+    const notesTA = notesDiv.querySelector('textarea');
+    notesTA.addEventListener('input', () => saveNotes(trackId));
+
     const releaseBtn = document.createElement('button');
     releaseBtn.className = 'release-btn';
     releaseBtn.dataset.track = trackId;
     releaseBtn.textContent = 'Release';
     releaseBtn.addEventListener('click', () => releaseTrack(trackId));
-    card.querySelector('.claim-area').appendChild(releaseBtn);
+    claimArea.appendChild(releaseBtn);
   }
 }
 
 // ===== ADMIN =====
 function exportClaims() {
-  const lines = [];
+  const lines = ['SUN SESSIONS — TRACK CLAIMS', 'Simply Soulful · 2321 S Jackson St · July 26, 2026', '', '---', ''];
   TRACKS.forEach(t => {
-    const artist = claims[t.id] || '(Available)';
-    lines.push(`${t.title} — ${artist}`);
+    const cd = claims[t.id];
+    const artist = (cd && cd.artist) ? cd.artist : '(Available)';
+    const notes = (cd && cd.notes) ? cd.notes : '';
+    lines.push(`${t.title}  [${t.category}]`);
+    lines.push(`  Artist: ${artist}`);
+    if (notes) lines.push(`  Notes: ${notes}`);
+    lines.push('');
   });
   const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
